@@ -13,6 +13,10 @@ const definition = {
       url: 'http://localhost:3000/api',
       description: 'Local development',
     },
+    {
+      url: 'https://zoom-app-2m11.onrender.com/api',
+      description: 'Production (Render)',
+    },
   ],
   tags: [
     { name: 'Health', description: 'Service health' },
