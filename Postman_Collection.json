@@ -1,0 +1,262 @@
+{
+  "info": {
+    "name": "Zoom API Wrapper",
+    "description": "Standalone Zoom API wrapper for Flutter apps",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "your-api-key-here",
+      "type": "string"
+    },
+    {
+      "key": "meeting_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "admin@example.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Get Zoom Token (Debug)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/zoom/token",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "token"]
+        }
+      }
+    },
+    {
+      "name": "Generate ZAK Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    console.log('ZAK Token generated successfully');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userEmail\": \"{{user_email}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/zoom/zak-token",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "zak-token"]
+        }
+      }
+    },
+    {
+      "name": "Create Meeting",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    const response = pm.response.json();",
+              "    pm.environment.set('meeting_id', response.data.meetingId);",
+              "    console.log('Meeting ID:', response.data.meetingId);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userEmail\": \"{{user_email}}\",\n  \"topic\": \"Team Weekly Standup\",\n  \"startTime\": \"2026-02-20T10:00:00Z\",\n  \"duration\": 60,\n  \"timezone\": \"Asia/Kolkata\",\n  \"agenda\": \"Weekly team sync\",\n  \"settings\": {\n    \"host_video\": true,\n    \"participant_video\": true,\n    \"mute_upon_entry\": true\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/zoom/meeting",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "meeting"]
+        }
+      }
+    },
+    {
+      "name": "Get Meeting Details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/zoom/meeting/{{meeting_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "meeting", "{{meeting_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Generate Single OBF Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"meetingId\": \"{{meeting_id}}\",\n  \"userName\": \"John Doe\",\n  \"userEmail\": \"john@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/zoom/obf-token",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "obf-token"]
+        }
+      }
+    },
+    {
+      "name": "Generate Batch OBF Tokens",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"meetingId\": \"{{meeting_id}}\",\n  \"users\": [\n    {\n      \"userName\": \"John Doe\",\n      \"userEmail\": \"john@example.com\"\n    },\n    {\n      \"userName\": \"Jane Smith\",\n      \"userEmail\": \"jane@example.com\"\n    },\n    {\n      \"userName\": \"Bob Johnson\",\n      \"userEmail\": \"bob@example.com\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/zoom/obf-tokens/batch",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "obf-tokens", "batch"]
+        }
+      }
+    },
+    {
+      "name": "Update Meeting",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Updated Meeting Title\",\n  \"duration\": 90\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/zoom/meeting/{{meeting_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "meeting", "{{meeting_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Delete Meeting",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/zoom/meeting/{{meeting_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "meeting", "{{meeting_id}}"]
+        }
+      }
+    },
+    {
+      "name": "List Zoom Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/zoom/users",
+          "host": ["{{base_url}}"],
+          "path": ["zoom", "users"]
+        }
+      }
+    }
+  ]
+}
